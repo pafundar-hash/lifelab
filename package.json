@@ -1,0 +1,36 @@
+{
+  "name": "lifelab",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+ "scripts": {
+  "dev": "vite",
+  "server": "node server.cjs",
+  "dev:all": "concurrently -k \"npm run dev\" \"npm run server\"",
+  "build": "vite build",
+  "lint": "eslint .",
+  "preview": "vite preview"
+},
+  "dependencies": {
+    "axios": "^1.21.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "form-data": "^4.0.6",
+    "multer": "^2.5.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.6",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "vite": "^8.3.5"
+  }
+}

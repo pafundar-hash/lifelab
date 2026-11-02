@@ -1,0 +1,131 @@
+/* LIFE LAB — BIOSCAN ROOM */
+
+.bioscan-page {
+  max-width: 1000px;
+  min-height: 80vh;
+  margin: auto;
+  padding: 50px 7%;
+  color: #294333;
+}
+
+.bioscan-heading {
+  text-align: center;
+}
+
+.bioscan-eyebrow {
+  color: #a58b4d;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.bioscan-heading h1 {
+  font-family: Georgia, serif;
+  font-size: 40px;
+  margin: 15px 0;
+}
+
+.bioscan-heading p,
+.bioscan-upload p {
+  color: #879083;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.bioscan-types {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 35px 0;
+  flex-wrap: wrap;
+}
+
+.bioscan-types div {
+  padding: 12px 20px;
+  background: #edf0e7;
+  border-radius: 30px;
+  color: #31513b;
+}
+
+.bioscan-types span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.bioscan-upload,
+.bioscan-camera,
+.bioscan-preview {
+  padding: 30px;
+  margin-top: 25px;
+  border: 1px solid #e5e8df;
+  border-radius: 10px;
+  background: #fffefa;
+  text-align: center;
+}
+
+.bioscan-upload-icon {
+  font-size: 48px;
+}
+
+.bioscan-upload h2,
+.bioscan-camera h2,
+.bioscan-preview h2 {
+  font-family: Georgia, serif;
+  color: #31513b;
+}
+
+.bioscan-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.bioscan-actions button {
+  padding: 13px 22px;
+  background: #31513b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.bioscan-actions button:last-child {
+  background: #e9ede3;
+  color: #31513b;
+}
+
+.bioscan-video,
+.bioscan-preview img {
+  display: block;
+  width: 100%;
+  max-width: 550px;
+  max-height: 450px;
+  object-fit: contain;
+  margin: 20px auto;
+  border-radius: 8px;
+  background: #edf0e7;
+}
+
+.bioscan-note {
+  color: #879083;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+  .bioscan-page {
+    padding: 35px 5%;
+  }
+
+  .bioscan-heading h1 {
+    font-size: 32px;
+  }
+
+  .bioscan-upload,
+  .bioscan-camera,
+  .bioscan-preview {
+    padding: 20px;
+  }
+}
