@@ -1,13 +1,3618 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lifelab</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LifeLab | Interactive Biology Learning</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+:root {
+    --green: #244b36;
+    --dark: #173524;
+    --cream: #f8f6ef;
+    --gold: #c6a15b;
+    --text: #26382d;
+    --muted: #778078;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+}
+
+button, input, textarea, select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* HEADER */
+
+header {
+    background: white;
+    padding: 14px 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    box-shadow: 0 3px 18px #00000008;
+    min-height: 90px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+.brand-logo {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.brand-logo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.brand-text h1 {
+    font: 700 32px 'Playfair Display', serif;
+    color: var(--green);
+}
+
+.brand-text h1 span {
+    color: var(--gold);
+}
+
+.brand-text p {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.tagline {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+nav {
+    display: flex;
+    gap: 13px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+nav a {
+    font-size: 12px;
+    font-weight: 600;
+    color: #48574d;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+nav a.active,
+nav a:hover {
+    color: var(--gold);
+}
+
+.menu-toggle {
+    display: none;
+    border: 0;
+    background: none;
+    color: var(--green);
+    font-size: 24px;
+}
+
+/* SIGN IN */
+
+#authGate {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, var(--dark), var(--green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+}
+
+.auth-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+
+.auth-card .brand-logo {
+    margin: 0 auto 15px;
+}
+
+.auth-card h2 {
+    font: 600 28px 'Playfair Display';
+    color: var(--green);
+    margin-bottom: 12px;
+}
+
+.auth-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin: 12px 0;
+}
+
+.auth-logo {
+    width: 85px;
+    height: 85px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-logo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.primary,
+.action {
+    border: 0;
+    border-radius: 3px;
+    padding: 12px 18px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.primary {
+    background: var(--gold);
+    color: var(--dark);
+}
+
+.action {
+    background: var(--green);
+    color: white;
+}
+
+.action:hover {
+    background: var(--dark);
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #d9ded8;
+    background: white;
+    margin: 8px 0 12px;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+#mainApp {
+    display: none;
+}
+
+/* HOMEPAGE */
+
+.hero {
+    min-height: 530px;
+    padding: 80px 8%;
+    display: flex;
+    align-items: center;
+    background:
+        linear-gradient(90deg, #0f2519e8, #142e1fa8, #142e1f33),
+        url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?auto=format&fit=crop&w=2000&q=85')
+        center/cover;
+    color: white;
+}
+
+.hero-content {
+    max-width: 720px;
+}
+
+.hero-label {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: #e4c98c;
+    margin-bottom: 20px;
+}
+
+.hero h2 {
+    font: 600 clamp(40px, 6vw, 70px)/1.1 'Playfair Display';
+    margin-bottom: 20px;
+}
+
+.hero h2 span {
+    color: #e1c17d;
+    font-style: italic;
+}
+
+.hero h3 {
+    font: 26px 'Playfair Display';
+    margin-bottom: 15px;
+}
+
+.hero p {
+    max-width: 540px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+.hero-tagline {
+    font-family: serif;
+    font-style: italic;
+    letter-spacing: 1px;
+    color: #e1c17d !important;
+    font-size: 18px !important;
+    margin-top: -8px;
+}
+
+/* ROOMS */
+
+.rooms-section,
+.room-page {
+    padding: 55px 7%;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.section-heading h2,
+.room-title {
+    font: 600 38px 'Playfair Display';
+    color: var(--green);
+}
+
+.section-heading p,
+.room-description {
+    color: var(--muted);
+    margin: 10px 0 25px;
+    line-height: 1.7;
+}
+
+.eyebrow {
+    color: var(--gold);
+    letter-spacing: 3px;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.room-card,
+.room-box {
+    background: white;
+    border: 1px solid #e9e7df;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.room-card h3,
+.room-box h3 {
+    font: 600 23px 'Playfair Display';
+    color: var(--green);
+    margin-bottom: 12px;
+}
+
+.room-card p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+.room-card button {
+    margin-top: 15px;
+    border: 0;
+    background: none;
+    color: var(--green);
+    font-weight: 700;
+}
+
+/* GOLD EXPLORE ROOM BUTTONS */
+
+.room-card button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin-top: 20px;
+    padding: 12px 22px;
+
+    background: transparent;
+    color: #c6a15b;
+
+    border: 1.5px solid #c6a15b;
+    border-radius: 6px;
+
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.room-card button:hover {
+    background: #c6a15b;
+    color: #173524;
+
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px #c6a15b30;
+}
+
+.room-number {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+}
+
+.room-page {
+    display: none;
+    min-height: 60vh;
+}
+
+.room-page.active {
+    display: block;
+}
+
+.back-btn {
+    border: 0;
+    background: none;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.result {
+    margin-top: 15px;
+    line-height: 1.7;
+}
+
+.small {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* CALENDAR */
+
+.calendar-wrap {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 20px;
+}
+
+.calendar-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.calendar-head button {
+    padding: 8px 12px;
+    border: 0;
+    background: #f1eee5;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-grid div {
+    text-align: center;
+    padding: 9px 2px;
+    font-size: 12px;
+}
+
+.weekday {
+    font-weight: bold;
+    color: var(--muted);
+}
+
+.day {
+    background: #f8f6ef;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.day.selected {
+    background: var(--green);
+    color: white;
+}
+
+.day.has-event {
+    border-bottom: 3px solid var(--gold);
+}
+
+.event-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* PROFILE */
+
+.stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.stat {
+    padding: 12px 16px;
+    background: #f6f4ed;
+    border: 1px solid #e7e2d6;
+    min-width: 100px;
+}
+
+.stat strong {
+    display: block;
+    font-size: 22px;
+    color: var(--green);
+}
+
+.stat span {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.profile-top {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.avatar {
+    width: 95px;
+    height: 95px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+}
+
+#qrCode {
+    display: inline-block;
+    background: white;
+    padding: 8px;
+    margin-top: 10px;
+}
+
+/* FOOTER */
+
+footer {
+    background: var(--dark);
+    color: white;
+    padding: 50px 7% 20px;
+    margin-top: 40px;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 30px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.footer-brand h2 {
+    font: 32px 'Playfair Display';
+    margin-bottom: 15px;
+}
+
+.footer-brand h2 span {
+    color: var(--gold);
+}
+
+.footer-column h3 {
+    color: #e1c17d;
+    font: 600 18px 'Playfair Display';
+    margin-bottom: 15px;
+}
+
+.footer-column p {
+    font-size: 12px;
+    line-height: 1.8;
+    color: #ffffffb3;
+}
+
+.footer-column a {
+    display: block;
+    color: #ffffffd9;
+    font-size: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.footer-column a:hover {
+    color: var(--gold);
+}
+
+.footer-bottom {
+    border-top: 1px solid #ffffff22;
+    margin-top: 35px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.footer-bottom p {
+    font-size: 11px;
+    color: #ffffffb3;
+    line-height: 1.8;
+}
+/* FOOTER LOGO */
+
+.footer-logo {
+    width: 65px;
+    height: 65px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+/* FILES AND QUIZ */
+.file-panel
+ {
+    border: 1px dashed #b7c4b8;
+    background: #fbfaf6;
+    padding: 18px;
+    margin: 12px 0;
+}
+
+.file-status {
+    padding: 10px;
+    background: #f3f1e8;
+    margin: 10px 0;
+    font-size: 13px;
+}
+
+.quiz-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 8px 0;
+}
+
+.badge {
+    display: inline-block;
+    background: #f1eee5;
+    padding: 5px 9px;
+    font-size: 11px;
+    color: var(--green);
+    margin: 3px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .rooms-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tagline {
+        display: none;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    header {
+        padding: 10px 4%;
+        min-height: 70px;
+    }
+
+    .brand {
+        gap: 9px;
+    }
+
+    .brand-logo {
+        width: 52px;
+        height: 52px;
+    }
+
+    .brand-text h1 {
+        font-size: 25px;
+    }
+
+    .brand-text p {
+        font-size: 7px;
+        letter-spacing: 1px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+    }
+
+    nav.show {
+        display: flex;
+    }
+
+    nav a {
+        padding: 13px 7%;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+    }
+
+    .rooms-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-wrap {
+        grid-template-columns: 1fr;
+    }
+
+    .room-page {
+        padding: 30px 5%;
+    }
+
+    .hero {
+        padding: 55px 6%;
+        min-height: 500px;
+    }
+
+    .hero h2 {
+        font-size: 42px;
+    }
+
+    .section-heading h2,
+    .room-title {
+        font-size: 32px;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+
+<div id="authGate">
+    <div class="auth-card">
+
+        <!-- LifeLab LL Double Helix Logo -->
+        <div class="auth-logo">
+            <svg viewBox="0 0 100 100"
+                 xmlns="http://www.w3.org/2000/svg"
+                 aria-label="LifeLab LL Double Helix Logo">
+
+                <g fill="none"
+                   stroke-linecap="round"
+                   stroke-linejoin="round">
+
+                    <!-- L - Forest Green -->
+                    <path d="M25 15 V78 H43"
+                          stroke="#244b36"
+                          stroke-width="7"/>
+
+                    <!-- L - Gold -->
+                    <path d="M75 15 V78 H57"
+                          stroke="#c6a15b"
+                          stroke-width="7"/>
+
+                    <!-- DNA Helix -->
+                    <path d="M25 20 C75 30 25 45 75 57 C60 68 42 74 25 80"
+                          stroke="#244b36"
+                          stroke-width="4"/>
+
+                    <path d="M75 20 C25 30 75 45 25 57 C40 68 58 74 75 80"
+                          stroke="#c6a15b"
+                          stroke-width="4"/>
+
+                    <!-- DNA Connections -->
+                    <path d="M38 27 L62 27
+                             M33 39 L67 39
+                             M33 50 L67 50
+                             M38 62 L62 62"
+                          stroke="#c6a15b"
+                          stroke-width="3"/>
+                </g>
+            </svg>
+        </div>
+
+        <h2>Welcome to LifeLab<span style="color:#c6a15b">.</span></h2>
+
+        <p>
+            Your personal biology learning space.<br>
+            Sign in with your preferred email to continue.
+        </p>
+
+        <form onsubmit="signIn(event)">
+            <input id="signInName" placeholder="Nickname" required>
+            <input id="signInEmail" type="email" placeholder="Email address" required>
+
+            <button type="button" class="action" style="width:100%"
+        onclick="signIn(event)">
+    CONTINUE TO LIFELAB
+</button>
+        </form>
+
+        <p class="small">
+            Prototype sign-in. Details are saved in this browser only.
+        </p>
+
+    </div>
+</div>
+
+<div id="mainApp">
+
+<header>
+
+    <div class="brand">
+
+        <!-- Minimalist LL Double Helix Logo -->
+        <div class="brand-logo">
+            <svg viewBox="0 0 100 100"
+                 xmlns="http://www.w3.org/2000/svg"
+                 aria-label="LifeLab LL Double Helix Logo">
+
+                <g fill="none"
+                   stroke-linecap="round"
+                   stroke-linejoin="round">
+
+                    <!-- Letter L - Forest Green -->
+                    <path d="M25 15 V78 H43"
+                          stroke="#244b36"
+                          stroke-width="7"/>
+
+                    <!-- Letter L - Gold -->
+                    <path d="M75 15 V78 H57"
+                          stroke="#c6a15b"
+                          stroke-width="7"/>
+
+                    <!-- DNA Double Helix -->
+                    <path d="M25 20
+                             C75 30 25 45 75 57
+                             C60 68 42 74 25 80"
+                          stroke="#244b36"
+                          stroke-width="4"/>
+
+                    <path d="M75 20
+                             C25 30 75 45 25 57
+                             C40 68 58 74 75 80"
+                          stroke="#c6a15b"
+                          stroke-width="4"/>
+
+                    <!-- DNA Connections -->
+                    <path d="M38 27 L62 27
+                             M33 39 L67 39
+                             M33 50 L67 50
+                             M38 62 L62 62"
+                          stroke="#c6a15b"
+                          stroke-width="3"/>
+
+                </g>
+            </svg>
+        </div>
+
+        <div class="brand-text">
+            <h1>LifeLab<span>.</span></h1>
+            <p>INTERACTIVE BIOLOGY LEARNING</p>
+        </div>
+
+        <div class="tagline">
+            Learn Biology. Explore Life.
+        </div>
+
+    </div>
+
+    <button class="menu-toggle"
+            onclick="toggleMenu()">☰</button>
+
+    <nav id="navigation">
+        <a class="active" onclick="goHome()">Home</a>
+        <a onclick="openRoom('research')">Research</a>
+        <a onclick="openRoom('notes')">Notes</a>
+        <a onclick="openRoom('bioscan')">BioScan</a>
+        <a onclick="openRoom('quiz')">Quiz</a>
+        <a onclick="openRoom('lab')">3D Lab</a>
+      <a onclick="openRoom('microscope')">MicroScope Lab</a>
+        <a onclick="openRoom('profile')">Profile</a>
+    </nav>
+
+</header>
+
+<main id="homePage">
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-label">
+            YOUR JOURNEY INTO BIOLOGY STARTS HERE
+        </div>
+
+        <h2>
+            YOUR PERSONAL<br>
+            BIOLOGY <span>LEARNING SPACE</span>
+        </h2>
+
+        <h3>Where curiosity comes alive.</h3>
+
+        <p class="hero-tagline">
+            Explore. Discover. Understand.
+        </p>
+
+        <p>
+            Explore the wonders of life, discover new knowledge,
+            and turn your curiosity into understanding.
+            Your journey through biology begins with LifeLab.
+        </p>
+
+        <button class="primary"
+            onclick="document.getElementById('rooms').scrollIntoView({behavior:'smooth'})">
+            EXPLORE LIFELAB →
+        </button>
+
+    </div>
+
+</section>
+
+<section class="rooms-section" id="rooms">
+
+    <div class="section-heading">
+
+        <div class="eyebrow">
+            DISCOVER • LEARN • EXPLORE
+        </div>
+
+        <h2>Explore Our Rooms</h2>
+
+        <p>
+            Everything you need for your biology learning journey.
+        </p>
+
+    </div>
+
+    <div class="rooms-grid">
+
+        <div class="room-card">
+            <div class="room-number">01 / RESEARCH</div>
+            <h3>Research Room</h3>
+            <p>Discover scientific publications and biology research.</p>
+            <button onclick="openRoom('research')">EXPLORE ROOM →</button>
+        </div>
+
+        <div class="room-card">
+            <div class="room-number">02 / NOTES</div>
+            <h3>Notes Room</h3>
+            <p>Write, organize, and schedule study sessions.</p>
+            <button onclick="openRoom('notes')">EXPLORE ROOM →</button>
+        </div>
+
+        <div class="room-card">
+            <div class="room-number">03 / BIOSCAN</div>
+            <h3>BioScan Room</h3>
+            <p>Upload plant and animal images for preview.</p>
+            <button onclick="openRoom('bioscan')">EXPLORE ROOM →</button>
+        </div>
+
+        <div class="room-card">
+            <div class="room-number">04 / QUIZ</div>
+            <h3>Quiz Room</h3>
+            <p>Practice biology questions and earn points.</p>
+            <button onclick="openRoom('quiz')">EXPLORE ROOM →</button>
+        </div>
+
+        <div class="room-card">
+            <div class="room-number">05 / 3D LAB</div>
+            <h3>3D Lab</h3>
+            <p>Explore interactive biological models.</p>
+            <button onclick="openRoom('lab')">EXPLORE ROOM →</button>
+        </div>
+<div class="room-card">
+    <div class="room-number">06 / MICROSCOPE</div>
+    <h3>MicroScope Lab</h3>
+    <p>Explore microscopic organisms and practice laboratory identification.</p>
+    <button onclick="openRoom('microscope')">EXPLORE ROOM →</button>
+</div>
+        <div class="room-card">
+            <div class="room-number">07 / PROFILE</div>
+            <h3>Profile Room</h3>
+            <p>Customize your profile and invite friends.</p>
+            <button onclick="openRoom('profile')">EXPLORE ROOM →</button>
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+  <!-- =========================
+     RESEARCH ROOM
+========================= -->
+
+<section class="room-page" id="research">
+
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+
+    <h2 class="room-title">Research Room</h2>
+
+    <p class="room-description">
+        Search scientific publications and biology articles.
+    </p>
+
+    <div class="room-box">
+        <h3>Search Scientific Publications</h3>
+
+        <input id="researchSearch"
+            placeholder="Search biology topics or article titles">
+
+        <button class="action" onclick="searchResearch()">
+            SEARCH ARTICLES
+        </button>
+
+        <div id="researchResults" class="result"></div>
+    </div>
+
+    <div class="room-box">
+        <h3>Biology Subjects</h3>
+        <div id="subjectButtons"></div>
+    </div>
+
+</section>
+
+
+<!-- =========================
+     NOTES ROOM
+========================= -->
+
+<section class="room-page" id="notes">
+
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+
+    <h2 class="room-title">Notes & Planner Room</h2>
+
+    <p class="room-description">
+        Save notes and organize your study schedule.
+    </p>
+
+    <div class="room-box">
+
+        <h3>Create a Note</h3>
+
+        <input id="noteTitle" placeholder="Note title">
+
+        <textarea id="noteContent"
+            placeholder="Write notes here..."></textarea>
+
+        <button class="action" onclick="saveNote()">
+            SAVE NOTE
+        </button>
+
+    </div>
+
+    <div class="room-box">
+
+        <h3>Study Calendar</h3>
+
+        <div class="calendar-wrap">
+
+            <div>
+
+                <div class="calendar-head">
+
+                    <button onclick="changeMonth(-1)">‹</button>
+
+                    <strong id="calendarMonth"></strong>
+
+                    <button onclick="changeMonth(1)">›</button>
+
+                </div>
+
+                <div class="calendar-grid" id="calendarGrid"></div>
+
+            </div>
+
+            <div>
+
+                <h3 id="selectedDateLabel">Selected date</h3>
+
+                <input id="eventTitle" placeholder="Schedule title">
+
+                <input id="eventTime" type="time">
+
+                <textarea id="eventDetails"
+                    placeholder="Schedule details"
+                    style="min-height:70px"></textarea>
+
+                <button class="action" onclick="addEvent()">
+                    ADD SCHEDULE
+                </button>
+
+                <div id="eventsForDate" class="result"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="room-box">
+
+        <h3>Your Saved Notes</h3>
+
+        <div id="savedNotes"></div>
+
+    </div>
+  
+</section>
+  
+<!-- =========================
+BIOSCAN ROOM
+========================= -->
+
+
+<section class="room-page" id="bioscan">
+
+    <button class="back-btn" onclick="goHome()">
+        ← Back to Home
+    </button>
+
+    <h2 class="room-title">BioScan Room</h2>
+
+    <p class="room-description">
+        Discover plant and animal species using AI identification.
+    </p>
+
+    <!-- PLANT IDENTIFICATION -->
+    <div class="room-box">
+
+        <h3>🌿 Plant Identification</h3>
+
+        <p class="small">
+            Upload a clear photo of a plant, leaf, flower, or fruit.
+        </p>
+
+        <input
+            type="file"
+            id="bioImage"
+            accept="image/jpeg,image/png"
+            onchange="previewBioImage(event)"
+        >
+
+        <div id="bioPreview" class="result"></div>
+
+        <button
+            class="action"
+            type="button"
+            onclick="identifyPlant()"
+            style="width:100%;margin-top:15px;">
+            IDENTIFY PLANT
+        </button>
+
+        <div id="bioResults" class="result" style="margin-top:20px;"></div>
+
+        <p class="small" style="margin-top:15px;">
+            Identification powered by PlantNet.
+            Results are AI predictions and may not always be accurate.
+        </p>
+
+    </div>
+
+    <!-- ANIMAL IDENTIFICATION -->
+    <div class="room-box" style="margin-top:25px;">
+
+        <h3>🐾 Animal Identification</h3>
+
+        <p class="small">
+            Upload a clear photo of an animal.
+        </p>
+
+        <input
+            type="file"
+            id="animalImage"
+            accept="image/jpeg,image/png,image/webp"
+            onchange="previewAnimalImage(event)"
+        >
+
+        <div id="animalPreview" class="result"></div>
+
+        <button
+            class="action"
+            type="button"
+            onclick="identifyAnimal()"
+            style="width:100%;margin-top:15px;">
+            IDENTIFY ANIMAL
+        </button>
+
+        <div id="animalResults" class="result" style="margin-top:20px;"></div>
+
+        <p class="small" style="margin-top:15px;">
+            Identification powered by Gemini AI.
+            Results are predictions and may not always confirm the exact species.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     QUIZ ROOM
+========================= -->
+
+<section class="room-page" id="quiz">
+
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+
+    <h2 class="room-title">Quiz Room</h2>
+
+    <p class="room-description">
+        Practice biology questions using LifeLab or your own uploaded reviewer.
+    </p>
+
+    <div class="room-box">
+
+        <h3>Your Learning Progress</h3>
+
+        <div class="stats">
+            <div class="stat">
+                <strong id="quizPoints">0</strong>
+                <span>Total Points</span>
+            </div>
+
+            <div class="stat">
+                <strong id="quizStreak">0</strong>
+                <span>Day Streak</span>
+            </div>
+
+            <div class="stat">
+                <strong id="quizBest">0</strong>
+                <span>Best Score</span>
+            </div>
+        </div>
+
+        <p class="small">
+            Earn 10 points for each correct answer.
+        </p>
+
+    </div>
+
+    <div class="room-box">
+
+        <h3>Upload Your Reviewer / PPT</h3>
+
+        <p class="small">
+            Upload PDF, PPTX, DOCX, TXT, or text-based notes.
+            The website extracts text and creates basic practice questions.
+        </p>
+
+        <div class="file-panel">
+
+            <input
+                type="file"
+                id="reviewerFile"
+                accept=".pdf,.pptx,.docx,.txt,.md"
+                onchange="handleReviewerUpload(event)"
+                style="display:block; width:100%; padding:12px; cursor:pointer;"
+            >
+
+            <div id="reviewerStatus" class="file-status">
+                No reviewer uploaded yet.
+            </div>
+
+            <button class="action" onclick="generateReviewerQuiz()">
+                GENERATE QUIZ FROM REVIEWER
+            </button>
+
+        </div>
+
+        <div id="reviewerPreview" class="small"></div>
+
+    </div>
+
+    <div class="room-box">
+
+        <h3>Choose Quiz Mode</h3>
+
+        <select id="quizMode">
+            <option value="mixed">Mixed Questions</option>
+            <option value="multiple">Multiple Choice</option>
+            <option value="identification">Identification</option>
+            <option value="truefalse">True or False</option>
+            <option value="essay">Essay</option>
+        </select>
+
+        <select id="quizLength">
+            <option value="10">10 Questions</option>
+            <option value="50">50 Questions</option>
+            <option value="100">100 Questions</option>
+        </select>
+
+        <button class="action" onclick="startQuiz()">
+            START BIOLOGY PRACTICE
+        </button>
+
+    </div>
+
+    <div class="room-box" id="quizArea" style="display:none">
+
+        <div id="quizQuestion"></div>
+        <div id="quizFeedback"></div>
+
+        <button class="action"
+            id="quizNext"
+            onclick="nextQuestion()"
+            style="display:none">
+            NEXT QUESTION
+        </button>
+
+    </div>
+
+</section>
+
+<!-- =========================
+     3D LAB
+========================= -->
+
+<section class="room-page" id="lab">
+
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+
+    <h2 class="room-title">3D Lab</h2>
+
+    <p class="room-description">
+        Explore interactive biological models.
+    </p>
+
+    <div class="room-box">
+
+        <h3>Interactive Biology Resources</h3>
+
+        <a class="primary"
+            href="https://molview.org/"
+            target="_blank">
+
+            OPEN MOLVIEW →
+
+        </a>
+
+        <br><br>
+
+        <a class="primary"
+            href="https://www.cellsalive.com/"
+            target="_blank">
+
+            OPEN CELLS ALIVE →
+
+        </a>
+
+        <p class="small" style="margin-top:20px">
+            Premium 3D content may be added in future versions.
+        </p>
+
+    </div>
+
+</section>
+<section class="room-page" id="microscope">
+
+    <h2>MicroScope Lab</h2>
+    <p>Explore the microscopic world and practice identifying microorganisms.</p>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="room-card">
+        <h3>Microscope Image Upload</h3>
+        <p>Upload a photo taken through a microscope to begin your observation.</p>
+
+        <input type="file" id="microscopeImage" accept="image/*">
+
+        <div id="microscopePreview" style="margin-top:20px;"></div>
+      <div style="margin-top:20px;">
+    <button onclick="analyzeMicroscopeImage()" id="microscopeAnalyzeBtn">
+        ANALYZE IMAGE WITH AI
+    </button>
+
+    <p style="font-size:13px; margin-top:10px;">
+        AI-assisted preliminary analysis only. Laboratory confirmation may be required.
+    </p>
+
+    <div id="microscopeAIResult" style="margin-top:20px;"></div>
+      </div>
+    </div>
+  
+
+    <!-- OBSERVATION RECORD -->
+    <div class="room-card">
+        <h3>Microscope Observation Record</h3>
+        <p>Record the details of your microscopic specimen.</p>
+
+        <label>Specimen Name</label>
+        <input type="text" id="specimenName" placeholder="e.g. Pond water sample">
+
+        <label>Magnification</label>
+        <select id="microscopeMagnification">
+            <option value="">Select magnification</option>
+            <option>40x</option>
+            <option>100x</option>
+            <option>400x</option>
+            <option>1000x</option>
+        </select>
+        <label>Staining Method</label>
+        <select id="microscopeStain">
+            <option value="">Select staining method</option>
+            <option>Unstained / Wet mount</option>
+            <option>Gram staining</option>
+            <option>Simple staining</option>
+            <option>Other</option>
+        </select>
+
+        <label>Observed Shape</label>
+        <select id="microscopeShape">
+            <option value="">Select observed shape</option>
+            <option>Cocci (spherical)</option>
+            <option>Bacilli (rod-shaped)</option>
+            <option>Spirilla (spiral-shaped)</option>
+            <option>Filamentous</option>
+            <option>Irregular / Other</option>
+            <option>Not yet identified</option>
+        </select>
+
+        <label>Cell Arrangement</label>
+        <select id="microscopeArrangement">
+            <option value="">Select arrangement</option>
+            <option>Single</option>
+            <option>Pairs (diplo-)</option>
+            <option>Chains (strepto-)</option>
+            <option>Clusters (staphylo-)</option>
+            <option>Tetrads</option>
+            <option>Not observed</option>
+        </select>
+
+        <label>Additional Observations</label>
+        <textarea id="microscopeNotes" rows="4"
+            placeholder="Describe color, movement, structures, and other visible features..."></textarea>
+
+        <button onclick="saveMicroscopeObservation()">SAVE OBSERVATION</button>
+
+        <div id="microscopeResult" style="margin-top:20px;"></div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="room-card">
+        <h3>My Microscopy Dashboard</h3>
+        <p>Total Saved Observations</p>
+        <h2 id="microscopeTotal" style="color:#b18a45;">0</h2>
+        <p>Keep track of your laboratory observations.</p>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="room-card">
+        <h3>Saved Observations History</h3>
+        <p>Review your previously recorded microscope observations.</p>
+
+        <button onclick="exportMicroscopeObservations()">
+            DOWNLOAD MY OBSERVATIONS
+        </button>
+
+        <div id="microscopeHistory">
+            <p>No saved observations yet.</p>
+        </div>
+    </div>
+
+    <!-- REFERENCE GUIDE -->
+    <div class="room-card">
+        <h3>Microscopy Reference Guide</h3>
+        <p>Learn about the characteristics of different microorganisms.</p>
+
+        <div class="microscope-guide">
+
+            <div style="margin-bottom:18px;">
+                <h4>1. Bacteria</h4>
+                <p><strong>Cocci:</strong> Spherical or round-shaped cells.</p>
+                <p><strong>Bacilli:</strong> Rod-shaped cells.</p>
+                <p><strong>Spirilla:</strong> Spiral-shaped cells.</p>
+                <p><strong>Common arrangements:</strong> Single, pairs, chains, and clusters.</p>
+            </div>
+
+            <div style="margin-bottom:18px;">
+                <h4>2. Protozoa</h4>
+                <p>Single-celled eukaryotic organisms. Some move using cilia, flagella, or pseudopodia.</p>
+            </div>
+
+            <div style="margin-bottom:18px;">
+                <h4>3. Algae</h4>
+                <p>Photosynthetic organisms that may appear as single cells, colonies, or filaments.</p>
+            </div>
+
+            <div style="margin-bottom:18px;">
+                <h4>4. Fungi</h4>
+                <p>May appear as budding yeast cells or thread-like hyphae.</p>
+            </div>
+
+            <div style="margin-bottom:18px;">
+                <h4>5. Microscopy Reminders</h4>
+                <ul>
+                    <li>Record the magnification used.</li>
+                    <li>Observe cell shape and arrangement.</li>
+                    <li>Record the staining method.</li>
+                    <li>Compare observations with reliable laboratory references.</li>
+                    <li>Do not identify bacterial species based on shape alone.</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<!-- =========================
+     PROFILE ROOM
+========================= -->
+
+<section class="room-page" id="profile">
+
+    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+
+    <h2 class="room-title">Profile Room</h2>
+
+    <p class="room-description">
+        Customize your profile and invite friends.
+    </p>
+
+    <div class="room-box">
+
+        <div class="profile-top">
+
+            <img id="profileAvatar"
+                class="avatar"
+                src="https://placehold.co/200x200/173524/c6a15b?text=LifeLab"
+                alt="Profile picture">
+
+            <div>
+
+                <h3 id="profileDisplayName">LifeLab Student</h3>
+
+                <p id="profileDisplayEmail" class="small"></p>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <strong id="profilePoints">0</strong>
+                        <span>Points</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong id="profileStreak">0</strong>
+                        <span>Streak</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong id="profileReferrals">0</strong>
+                        <span>Invites</span>
+                    </div>
+
+                    <div class="stat">
+                        <strong id="profileReferralPoints">0</strong>
+                        <span>Referral Points</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <h3>Edit Profile</h3>
+
+        <input id="profileName" placeholder="Nickname">
+
+        <input id="profileEmail" type="email" placeholder="Email">
+
+        <textarea id="profileBio"
+            placeholder="Tell us about yourself..."></textarea>
+
+        <p class="small">Profile picture</p>
+
+        <input type="file"
+            id="profilePicture"
+            accept="image/*"
+            onchange="loadProfilePicture(event)">
+
+        <button class="action" onclick="saveProfile()">
+            SAVE PROFILE
+        </button>
+
+        <div id="profileResult" class="result"></div>
+
+    </div>
+
+    <div class="room-box">
+
+        <h3>Invite Friends to LifeLab</h3>
+
+        <p class="small">
+            Share your invitation link. Referral rewards are demo-only
+            in this prototype and are not verified across devices.
+        </p>
+
+        <input id="referralLink" readonly>
+
+        <button class="action" onclick="copyReferral()">
+            COPY INVITE LINK
+        </button>
+
+        <div id="qrCode"></div>
+
+        <p id="referralMessage" class="small"></p>
+
+    </div>
+
+</section>
+
+
+<!-- ========================
+     FOOTER / ABOUT US
+========================= -->
+
+<footer>
+
+    <div class="footer-container">
+
+        
+<div class="footer-brand">
+
+    <!-- LifeLab LL Double Helix Logo -->
+    <div class="footer-logo">
+        <svg viewBox="0 0 100 100"
+             xmlns="http://www.w3.org/2000/svg">
+
+            <g fill="none"
+               stroke-linecap="round"
+               stroke-linejoin="round">
+
+                <path d="M25 15 V78 H43"
+                      stroke="#244b36"
+                      stroke-width="7"/>
+
+                <path d="M75 15 V78 H57"
+                      stroke="#c6a15b"
+                      stroke-width="7"/>
+
+                <path d="M25 20 C75 30 25 45 75 57 C60 68 42 74 25 80"
+                      stroke="#244b36"
+                      stroke-width="4"/>
+
+                <path d="M75 20 C25 30 75 45 25 57 C40 68 58 74 75 80"
+                      stroke="#c6a15b"
+                      stroke-width="4"/>
+
+                <path d="M38 27 L62 27
+                         M33 39 L67 39
+                         M33 50 L67 50
+                         M38 62 L62 62"
+                      stroke="#c6a15b"
+                      stroke-width="3"/>
+            </g>
+        </svg>
+    </div>
+
+    <h2>LifeLab<span>.</span></h2>
+
+
+            <p>
+                Your interactive laboratory for learning,
+                researching, and discovering the wonders of Biology.
+            </p>
+
+            <p style="margin-top:15px;color:#e1c17d;">
+                Explore. Understand. Discover.
+            </p>
+
+        </div>
+
+        <div class="footer-column">
+
+            <h3>About Us</h3>
+
+            <p>
+                LifeLab is an interactive Biology learning website
+                designed to make studying, researching, and exploring
+                Biology more engaging and accessible for students.
+            </p>
+
+        </div>
+
+        <div class="footer-column">
+
+            <h3>Our Mission</h3>
+
+            <p>
+                To provide students with an accessible digital learning
+                space where curiosity grows through interactive resources,
+                scientific research, and educational tools.
+            </p>
+
+        </div>
+
+        <div class="footer-column">
+
+            <h3>Explore</h3>
+
+            <a onclick="goHome()">Home</a>
+            <a onclick="openRoom('research')">Research Room</a>
+            <a onclick="openRoom('notes')">Notes Room</a>
+            <a onclick="openRoom('bioscan')">BioScan Room</a>
+            <a onclick="openRoom('quiz')">Quiz Room</a>
+<a onclick="openRoom('lab')">3D Lab</a>
+<a onclick="openRoom('microscope')">MicroScope Lab</a>
+<a onclick="openRoom('profile')">Profile Room</a>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+
+        <p>© 2026 LifeLab. All rights reserved.</p>
+
+        <p>Interactive Biology Learning Website</p>
+
+        <button class="action"
+            style="margin-top:15px"
+            onclick="signOut()">
+
+            SIGN OUT
+
+        </button>
+
+    </div>
+
+</footer>
+
+</div>
+  <script>
+
+// SIGN-IN
+
+function signIn(e) {
+    e.preventDefault();
+
+    const user = {
+        name: document.getElementById('signInName').value.trim(),
+        email: document.getElementById('signInEmail').value.trim()
+    };
+
+    if (!user.name || !user.email) return;
+
+    localStorage.setItem('lifelabUser', JSON.stringify(user));
+
+    document.getElementById('authGate').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+
+    loadProfile();
+    updateProgressUI();
+    checkReferral();
+}
+
+function signOut() {
+    localStorage.removeItem('lifelabUser');
+    location.reload();
+}
+
+
+// NAVIGATION
+
+function toggleMenu() {
+    document.getElementById('navigation').classList.toggle('show');
+}
+
+function closeMenu() {
+    document.getElementById('navigation').classList.remove('show');
+}
+
+function goHome() {
+    document.getElementById('homePage').style.display = 'block';
+
+    document.querySelectorAll('.room-page').forEach(x =>
+        x.classList.remove('active')
+    );
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
+    closeMenu();
+    setActiveNav('Home');
+}
+
+function openRoom(id) {
+    document.getElementById('homePage').style.display = 'none';
+
+    document.querySelectorAll('.room-page').forEach(x =>
+        x.classList.remove('active')
+    );
+
+    document.getElementById(id).classList.add('active');
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+
+    closeMenu();
+
+    const n = {
+        research: 'Research',
+        notes: 'Notes',
+        bioscan: 'BioScan',
+        quiz: 'Quiz',
+        lab: '3D Lab',
+      microscope: 'MicroScope Lab',
+        profile: 'Profile'
+    };
+
+    setActiveNav(n[id]);
+
+    if (id === 'notes') renderCalendar();
+    if (id === 'profile') loadProfile();
+    if (id === 'quiz') updateProgressUI();
+  if (id === 'microscope') renderMicroscopeHistory();
+}
+
+function setActiveNav(n) {
+    document.querySelectorAll('nav a').forEach(a =>
+        a.classList.toggle('active', a.textContent.trim() === n)
+    );
+}
+
+
+// RESEARCH ROOM
+
+const subjects = [
+    'Microbiology',
+    'Genetics',
+    'Botany',
+    'Zoology',
+    'Ecology',
+    'Anatomy',
+    'Parasitology',
+    'Evolutionary Biology',
+    'Biochemistry'
+];
+
+function renderSubjects() {
+    document.getElementById('subjectButtons').innerHTML =
+        subjects.map(s =>
+            `<button class="action" style="margin:4px"
+            onclick="searchSubject('${s}')">${s}</button>`
+        ).join('');
+}
+
+function searchSubject(s) {
+    document.getElementById('researchSearch').value = s;
+    searchResearch();
+}
+
+async function searchResearch() {
+
+    const q = document.getElementById('researchSearch').value.trim();
+    const out = document.getElementById('researchResults');
+
+    if (!q) {
+        out.textContent = 'Enter a topic first.';
+        return;
+    }
+
+    out.textContent = 'Searching publications...';
+
+    try {
+
+        const r = await fetch(
+            'https://api.crossref.org/works?query=' +
+            encodeURIComponent(q) + '&rows=8'
+        );
+
+        const d = await r.json();
+        const items = d.message.items || [];
+
+        out.innerHTML = items.length
+            ? items.map(a => {
+
+                let t = a.title?.[0] || 'Untitled';
+
+                let authors = a.author
+                    ? a.author.map(x =>
+                        (x.family || '') + ', ' + (x.given || '')
+                    ).join(', ')
+                    : 'Author unavailable';
+
+                let year =
+                    a.created?.['date-parts']?.[0]?.[0] || 'n.d.';
+
+                let journal =
+                    a['container-title']?.[0] || 'Source unavailable';
+
+                let url = a.DOI
+                    ? 'https://doi.org/' + a.DOI
+                    : a.URL || '';
+
+                return `
+                    <div style="padding:12px 0;border-bottom:1px solid #eee">
+                        <strong>${esc(t)}</strong>
+                        <p class="small">
+                            ${esc(authors)} (${year}). ${esc(journal)}
+                        </p>
+                        ${url
+                            ? `<a href="${url}" target="_blank">
+                                View publication ↗
+                               </a>`
+                            : ''}
+                    </div>
+                `;
+
+            }).join('')
+            : 'No results found';
+
+    } catch (e) {
+        out.textContent = 'Could not connect to publication database.';
+    }
+}
+
+
+// NOTES ROOM
+
+function saveNote() {
+
+    let title = noteTitle.value.trim();
+    let content = noteContent.value.trim();
+
+    if (!title || !content) {
+        alert('Enter both note title and content.');
+        return;
+    }
+
+    let a = JSON.parse(
+        localStorage.getItem('lifelabNotes') || '[]'
+    );
+
+    a.push({
+        title,
+        content,
+        date: new Date().toLocaleString()
+    });
+
+    localStorage.setItem('lifelabNotes', JSON.stringify(a));
+
+    noteTitle.value = '';
+    noteContent.value = '';
+
+    displayNotes();
+}
+
+function displayNotes() {
+
+    let a = JSON.parse(
+        localStorage.getItem('lifelabNotes') || '[]'
+    );
+
+    savedNotes.innerHTML = a.length
+        ? a.map((n, i) => `
+            <div style="padding:12px 0;border-bottom:1px solid #eee">
+
+                <h3>${esc(n.title)}</h3>
+
+                <small>${esc(n.date)}</small>
+
+                <p style="white-space:pre-wrap;margin:8px 0">
+                    ${esc(n.content)}
+                </p>
+
+                <button class="action" onclick="deleteNote(${i})">
+                    DELETE
+                </button>
+
+            </div>
+        `).join('')
+        : 'No saved notes yet.';
+}
+
+function deleteNote(i) {
+
+    let a = JSON.parse(
+        localStorage.getItem('lifelabNotes') || '[]'
+    );
+
+    a.splice(i, 1);
+
+    localStorage.setItem('lifelabNotes', JSON.stringify(a));
+
+    displayNotes();
+}
+
+
+// CALENDAR
+
+let calendarDate = new Date();
+let selectedDate = new Date();
+
+function dateKey(d) {
+    return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+}
+
+function changeMonth(n) {
+    calendarDate.setMonth(calendarDate.getMonth() + n);
+    renderCalendar();
+}
+
+function renderCalendar() {
+
+    const g = document.getElementById('calendarGrid');
+
+    if (!g) return;
+
+    let y = calendarDate.getFullYear();
+    let m = calendarDate.getMonth();
+
+    calendarMonth.textContent =
+        calendarDate.toLocaleDateString(undefined, {
+            month: 'long',
+            year: 'numeric'
+        });
+
+    let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+        .map(x => `<div class="weekday">${x}</div>`)
+        .join('');
+
+    let off = new Date(y, m, 1).getDay();
+    let days = new Date(y, m + 1, 0).getDate();
+
+    let events = JSON.parse(
+        localStorage.getItem('lifelabEvents') || '{}'
+    );
+
+    for (let i = 0; i < off; i++) {
+        html += '<div></div>';
+    }
+
+    for (let d = 1; d <= days; d++) {
+
+        let dt = new Date(y, m, d);
+        let key = dateKey(dt);
+
+        html += `
+            <div class="day
+                ${key === dateKey(selectedDate) ? 'selected' : ''}
+                ${events[key]?.length ? 'has-event' : ''}"
+                onclick="selectDate(${y},${m},${d})">
+                ${d}
+            </div>
+        `;
+    }
+
+    g.innerHTML = html;
+
+    showEvents();
+}
+
+function selectDate(y, m, d) {
+    selectedDate = new Date(y, m, d);
+    renderCalendar();
+}
+
+function showEvents() {
+
+    let key = dateKey(selectedDate);
+
+    let ev = JSON.parse(
+        localStorage.getItem('lifelabEvents') || '{}'
+    );
+
+    selectedDateLabel.textContent =
+        selectedDate.toLocaleDateString(undefined, {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+
+    let list = ev[key] || [];
+
+    eventsForDate.innerHTML = list.length
+        ? list.map((e, i) => `
+            <div class="event-item">
+
+                <strong>${esc(e.title)}</strong>
+
+                <p class="small">
+                    ${esc(e.time || 'No time')}
+                    ${e.details ? ' — ' + esc(e.details) : ''}
+                </p>
+
+                <button class="action"
+                    onclick="deleteEvent('${key}',${i})">
+                    REMOVE
+                </button>
+
+            </div>
+        `).join('')
+        : 'No schedules for this date.';
+}
+
+function addEvent() {
+
+    let title = eventTitle.value.trim();
+
+    if (!title) {
+        alert('Enter a schedule title');
+        return;
+    }
+
+    let key = dateKey(selectedDate);
+
+    let ev = JSON.parse(
+        localStorage.getItem('lifelabEvents') || '{}'
+    );
+
+    ev[key] = ev[key] || [];
+
+    ev[key].push({
+        title,
+        time: eventTime.value,
+        details: eventDetails.value.trim()
+    });
+
+    localStorage.setItem('lifelabEvents', JSON.stringify(ev));
+
+    eventTitle.value = '';
+    eventTime.value = '';
+    eventDetails.value = '';
+
+    renderCalendar();
+}
+
+function deleteEvent(key, i) {
+
+    let ev = JSON.parse(
+        localStorage.getItem('lifelabEvents') || '{}'
+    );
+
+    ev[key].splice(i, 1);
+
+    if (!ev[key].length) delete ev[key];
+
+    localStorage.setItem('lifelabEvents', JSON.stringify(ev));
+
+    renderCalendar();
+}
+
+
+// BIOSCAN ROOM
+
+function previewBioImage(e) {
+
+    let f = e.target.files[0];
+
+    if (!f) return;
+
+    if (!f.type.startsWith('image/')) {
+        bioPreview.textContent = 'Select an image file.';
+        return;
+    }
+
+    let r = new FileReader();
+
+    r.onload = () => {
+
+        bioPreview.innerHTML = `
+            <img src="${r.result}"
+            style="max-width:100%;max-height:350px">
+
+            <p>
+                Image preview ready.
+                Species identification needs AI/API.
+            </p>
+        `;
+
+    };
+
+    r.readAsDataURL(f);
+}
+    
+function previewAnimalImage(e) {
+
+    const file = e.target.files[0];
+    const preview = document.getElementById("animalPreview");
+
+  console.log("Animal preview function called!");
+ 
+  if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+        preview.textContent = "Please select an image file.";
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+        preview.innerHTML = `
+            <img src="${reader.result}"
+            style="max-width:100%;max-height:350px">
+
+            <p>Animal image preview ready.</p>
+        `;
+    };
+
+    reader.readAsDataURL(file);
+}
+
+async function identifyPlant() {
+    const fileInput = document.getElementById("bioImage");
+    const resultsBox = document.getElementById("bioResults");
+
+    if (!fileInput.files || !fileInput.files[0]) {
+        resultsBox.textContent = "Please upload a plant image first.";
+        return;
+    }
+
+    const image = fileInput.files[0];
+
+    if (!["image/jpeg", "image/png"].includes(image.type)) {
+        resultsBox.textContent = "Please upload a JPG or PNG image.";
+        return;
+    }
+
+    if (image.size > 10 * 1024 * 1024) {
+        resultsBox.textContent = "Image is too large. Maximum size is 10 MB.";
+        return;
+    }
+
+    resultsBox.textContent = "🌱 Identifying plant... Please wait.";
+
+    try {
+        const reader = new FileReader();
+
+        const imageData = await new Promise((resolve, reject) => {
+            reader.onload = () => {
+                resolve(String(reader.result).split(",")[1]);
+            };
+
+            reader.onerror = () => {
+                reject(new Error("Could not read image."));
+            };
+
+            reader.readAsDataURL(image);
+        });
+
+        const response = await fetch(
+            "https://lifelab-gemini.pafundar.workers.dev",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    action: "bioscan",
+                    imageData: imageData,
+                    mimeType: image.type
+                }),
+                signal: AbortSignal.timeout(40000)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            const details = data.details || data.error || "Plant identification failed.";
+
+            throw new Error(
+                typeof details === "string"
+                    ? details
+                    : JSON.stringify(details)
+            );
+        }
+
+        if (!data.results || data.results.length === 0) {
+            resultsBox.textContent =
+                "No identification found. Try a clearer image.";
+            return;
+        }
+
+        resultsBox.innerHTML = "<h3>Identification Results</h3>";
+
+        data.results.slice(0, 5).forEach((item, index) => {
+            const species = item.species || {};
+            const scientificName =
+                species.scientificNameWithoutAuthor || "Unknown species";
+            const commonNames = species.commonNames || [];
+            const confidence = (item.score * 100).toFixed(1);
+
+            const card = document.createElement("div");
+
+            card.style.cssText =
+                "padding:15px;margin:12px 0;border:1px solid #c6a15b;" +
+                "border-radius:8px;background:#f8f6ef;";
+
+            const name = document.createElement("h4");
+            name.textContent =
+                "Match #" + (index + 1) + ": " + scientificName;
+            name.style.color = "#244b36";
+
+            const common = document.createElement("p");
+            common.textContent = commonNames.length
+                ? "Common name: " + commonNames.join(", ")
+                : "Common name not available";
+
+            const score = document.createElement("p");
+            score.textContent = "Confidence score: " + confidence + "%";
+
+            card.append(name, common, score);
+            resultsBox.appendChild(card);
+        });
+
+        const attribution = document.createElement("p");
+        attribution.textContent = "Identification provided by PlantNet.";
+        resultsBox.appendChild(attribution);
+
+    } catch (error) {
+        console.error(error);
+        resultsBox.textContent =
+            "Could not identify plant: " + error.message;
+    }
+}
+
+async function identifyAnimal() {
+    const fileInput = document.getElementById("animalImage");
+    const resultsBox = document.getElementById("animalResults");
+
+    if (!fileInput.files || !fileInput.files[0]) {
+        resultsBox.textContent = "Please upload an animal image first.";
+        return;
+    }
+
+    const image = fileInput.files[0];
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
+        resultsBox.textContent = "Please upload a JPG, PNG, or WEBP image.";
+        return;
+    }
+
+    if (image.size > 10 * 1024 * 1024) {
+        resultsBox.textContent = "Image is too large. Maximum size is 10 MB.";
+        return;
+    }
+
+    resultsBox.textContent = "🐾 Identifying animal... Please wait.";
+
+    try {
+        const reader = new FileReader();
+
+        const imageData = await new Promise((resolve, reject) => {
+            reader.onload = () => {
+                resolve(String(reader.result).split(",")[1]);
+            };
+
+            reader.onerror = () => {
+                reject(new Error("Could not read image."));
+            };
+
+            reader.readAsDataURL(image);
+        });
+
+        const response = await fetch(
+            "https://lifelab-gemini.pafundar.workers.dev",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    action: "animal",
+                    imageData: imageData,
+                    mimeType: image.type
+                }),
+                signal: AbortSignal.timeout(125000)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success || !data.animal) {
+            const details = data.details || data.error || "Animal identification failed.";
+            throw new Error(
+                typeof details === "string"
+                    ? details
+                    : JSON.stringify(details)
+            );
+        }
+
+        const animal = data.animal;
+        const classification = animal.classification || {};
+
+        resultsBox.innerHTML = "";
+
+        const title = document.createElement("h3");
+        title.textContent = "🐾 Animal Identification Result";
+
+        const name = document.createElement("h2");
+        name.textContent = animal.commonName || "Unknown animal";
+
+        const scientific = document.createElement("p");
+        scientific.textContent =
+            "Scientific name: " + (animal.scientificName || "Uncertain");
+
+        const group = document.createElement("p");
+        group.textContent =
+            "Animal group: " + (animal.animalGroup || "Unknown");
+
+        const taxonomy = document.createElement("div");
+        taxonomy.innerHTML = "<h4>Classification</h4>";
+
+        ["kingdom", "phylum", "class", "order", "family"].forEach(rank => {
+            const p = document.createElement("p");
+            p.textContent =
+                rank.charAt(0).toUpperCase() + rank.slice(1) +
+                ": " + (classification[rank] || "Not determined");
+            taxonomy.appendChild(p);
+        });
+
+        const features = document.createElement("div");
+        features.innerHTML = "<h4>Visible Features</h4>";
+
+        (animal.visibleFeatures || []).forEach(feature => {
+            const p = document.createElement("p");
+            p.textContent = "• " + feature;
+            features.appendChild(p);
+        });
+
+        const habitat = document.createElement("p");
+        habitat.textContent = "Possible habitat: " + (animal.habitat || "Unknown");
+
+        const diet = document.createElement("p");
+        diet.textContent = "Possible diet: " + (animal.diet || "Unknown");
+
+        const confidence = document.createElement("p");
+        confidence.textContent =
+            "AI confidence: " + (animal.confidence || "Uncertain");
+
+        const summary = document.createElement("p");
+        summary.textContent = animal.summary || "";
+
+        const limitations = document.createElement("div");
+        limitations.innerHTML = "<h4>Identification Limitations</h4>";
+
+        (animal.limitations || []).forEach(item => {
+            const p = document.createElement("p");
+            p.textContent = "• " + item;
+            limitations.appendChild(p);
+        });
+
+        resultsBox.append(
+            title,
+            name,
+            scientific,
+            group,
+            taxonomy,
+            features,
+            habitat,
+            diet,
+            confidence,
+            summary,
+            limitations
+        );
+
+        const disclaimer = document.createElement("p");
+        disclaimer.textContent =
+            "Educational AI identification only. A photograph cannot always confirm an exact species.";
+        resultsBox.appendChild(disclaimer);
+
+    } catch (error) {
+        console.error(error);
+        resultsBox.textContent =
+            "Could not identify animal: " + error.message;
+    }
+}
+
+    // QUIZ AND REVIEWER IMPORT
+
+const bank = [
+    {
+        question: 'What is the basic structural and functional unit of life?',
+        answer: 'cell',
+        type: 'multiple',
+        options: ['Cell', 'Tissue', 'Organ', 'Organ system']
+    },
+    {
+        question: 'Which organelle performs photosynthesis?',
+        answer: 'chloroplast',
+        type: 'multiple',
+        options: ['Mitochondrion', 'Chloroplast', 'Nucleus', 'Ribosome']
+    },
+    {
+        question: 'What molecule carries genetic information?',
+        answer: 'dna',
+        type: 'identification'
+    },
+    {
+        question: 'Mitochondria are commonly associated with ATP production.',
+        answer: 'true',
+        type: 'truefalse'
+    },
+    {
+        question: 'Explain the importance of biodiversity.',
+        answer: '',
+        type: 'essay'
+    },
+    {
+        question: 'What process allows plants to make their own food?',
+        answer: 'photosynthesis',
+        type: 'identification'
+    },
+    {
+        question: 'Which kingdom includes mushrooms?',
+        answer: 'fungi',
+        type: 'multiple',
+        options: ['Plantae', 'Animalia', 'Fungi', 'Protista']
+    },
+    {
+        question: 'Bacteria are prokaryotic organisms.',
+        answer: 'true',
+        type: 'truefalse'
+    },
+    {
+        question: 'What is the function of ribosomes?',
+        answer: 'protein synthesis',
+        type: 'identification'
+    },
+    {
+        question: 'Describe how natural selection influences evolution.',
+        answer: '',
+        type: 'essay'
+    }
+];
+
+let reviewerText = '';
+let reviewerQuestions = [];
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizFinished = false;
+let quizSource = 'bank';
+
+
+async function handleReviewerUpload(e) {
+
+    const f = e.target.files[0];
+
+    if (!f) return;
+
+    reviewerStatus.textContent = 'Reading ' + f.name + '…';
+    reviewerText = '';
+
+    try {
+
+        const ext = f.name.split('.').pop().toLowerCase();
+
+        if (ext === 'txt' || ext === 'md') {
+
+            reviewerText = await f.text();
+
+        } else if (ext === 'pdf') {
+
+            if (!window.pdfjsLib)
+                throw Error('PDF reader library did not load.');
+
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+            const pdf = await pdfjsLib.getDocument({
+                data: await f.arrayBuffer()
+            }).promise;
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+
+                reviewerText +=
+                    content.items.map(x => x.str).join(' ') + '\n';
+            }
+
+        } else if (ext === 'docx') {
+
+            if (!window.mammoth)
+                throw Error('DOCX reader library did not load.');
+
+            reviewerText = (
+                await mammoth.extractRawText({
+                    arrayBuffer: await f.arrayBuffer()
+                })
+            ).value;
+
+        } else if (ext === 'pptx') {
+
+            if (!window.JSZip)
+                throw Error('PPTX reader library did not load.');
+
+            const zip = await JSZip.loadAsync(await f.arrayBuffer());
+
+            const slides = Object.keys(zip.files)
+                .filter(x => /^ppt\/slides\/slide\d+\.xml$/.test(x))
+                .sort((a, b) =>
+                    Number(a.match(/slide(\d+)/)[1]) -
+                    Number(b.match(/slide(\d+)/)[1])
+                );
+
+            for (const s of slides) {
+
+                let xml = await zip.files[s].async('text');
+
+                reviewerText +=
+                    xml.replace(/<a:t>/g, ' ')
+                       .replace(/<\/a:t>/g, ' ')
+                       .replace(/<[^>]+>/g, ' ') + '\n';
+            }
+
+        } else if (ext === 'ppt' || ext === 'doc') {
+
+            throw Error(
+                'Older .ppt/.doc files are not supported in-browser. Please save as .pptx/.docx or PDF.'
+            );
+
+        } else {
+
+            throw Error('Unsupported file format.');
+
+        }
+
+        reviewerText = reviewerText.replace(/\s+/g, ' ').trim();
+
+        if (!reviewerText)
+            throw Error('No readable text found.');
+
+        reviewerStatus.textContent =
+            `Uploaded: ${f.name} · ${reviewerText.length.toLocaleString()} characters extracted.`;
+
+        reviewerPreview.innerHTML = `
+            <strong>Reviewer preview:</strong>
+            <p>${esc(reviewerText.slice(0, 850))}
+            ${reviewerText.length > 850 ? '…' : ''}</p>
+        `;
+
+        reviewerQuestions = makeQuestionsFromText(reviewerText);
+
+        quizSource = 'reviewer';
+
+        alert(
+            'Reviewer text extracted. Click “Generate Quiz from Reviewer” to use it.'
+        );
+
+    } catch (err) {
+
+        reviewerStatus.textContent = 'Upload/read error: ' + err.message;
+
+        reviewerText = '';
+        reviewerQuestions = [];
+
+    }
+
+}
+
+
+function makeQuestionsFromText(text) {
+
+    let sentences = text.split(/(?<=[.!?])\s+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 45 && s.length < 400);
+
+    return sentences.slice(0, 100).map(s => {
+
+        let words = s.split(/\s+/);
+
+        let candidate = words.find(w =>
+            w.length > 6 &&
+            !/^(therefore|however|because|between|through|including)$/i.test(w)
+        ) || words[Math.min(3, words.length - 1)];
+
+        let blank = s.replace(candidate, '________');
+
+        return {
+            question: 'Fill in the missing term: ' + blank,
+            answer: candidate.replace(/[.,;:!?()]/g, '').toLowerCase(),
+            type: 'identification',
+            sourceSentence: s
+        };
+
+    });
+
+}
+
+
+function generateReviewerQuiz() {
+
+    if (!reviewerText || !reviewerQuestions.length) {
+        alert('Upload a readable reviewer first.');
+        return;
+    }
+
+    quizSource = 'reviewer';
+
+    document.getElementById('quizMode').value = 'identification';
+    document.getElementById('quizLength').value = '10';
+
+    alert(
+        `Quiz material ready! ${reviewerQuestions.length} text-based questions were prepared. Choose a question count and click START BIOLOGY PRACTICE.`
+    );
+
+}
+
+
+// PROGRESS
+
+function getProgress() {
+
+    return JSON.parse(
+        localStorage.getItem('lifelabProgress') ||
+        '{"points":0,"streak":0,"best":0,"lastDate":"","referrals":0}'
+    );
+
+}
+
+function saveProgress(p) {
+
+    localStorage.setItem('lifelabProgress', JSON.stringify(p));
+
+    updateProgressUI();
+
+}
+
+function updateProgressUI() {
+
+    let p = getProgress();
+
+    ['quizPoints', 'profilePoints'].forEach(id => {
+
+        let el = document.getElementById(id);
+
+        if (el) el.textContent = p.points;
+
+    });
+
+    ['quizStreak', 'profileStreak'].forEach(id => {
+
+        let el = document.getElementById(id);
+
+        if (el) el.textContent = p.streak;
+
+    });
+
+    let best = document.getElementById('quizBest');
+
+    if (best) best.textContent = p.best;
+
+    let refs = document.getElementById('profileReferrals');
+
+    if (refs) refs.textContent = p.referrals || 0;
+
+    let rp = document.getElementById('profileReferralPoints');
+
+    if (rp) rp.textContent = p.referralPoints || 0;
+
+}
+
+
+// QUIZ
+
+function startQuiz() {
+
+    let mode = quizMode.value;
+    let len = Number(quizLength.value);
+
+    let source =
+        quizSource === 'reviewer' && reviewerQuestions.length
+        ? reviewerQuestions
+        : bank;
+
+    let filtered =
+        mode === 'mixed'
+        ? source
+        : source.filter(q => q.type === mode);
+
+    if (!filtered.length) {
+
+        alert(
+            'No questions for this mode. Try Mixed Questions or Identification.'
+        );
+
+        return;
+
+    }
+
+    quizQuestions = [];
+
+    for (let i = 0; i < len; i++) {
+
+        quizQuestions.push(filtered[i % filtered.length]);
+
+    }
+
+    quizIndex = 0;
+    quizScore = 0;
+    quizFinished = false;
+
+    quizArea.style.display = 'block';
+
+    renderQuestion();
+
+}
+
+
+function renderQuestion() {
+
+    if (quizIndex >= quizQuestions.length) {
+
+        finishQuiz();
+        return;
+
+    }
+
+    let q = quizQuestions[quizIndex];
+
+    quizNext.style.display = 'none';
+
+    quizFeedback.innerHTML = '';
+    quizFeedback.dataset.answered = '';
+
+    let html = `
+        <p style="color:#c6a15b;font-weight:bold">
+            QUESTION ${quizIndex + 1} OF ${quizQuestions.length}
+        </p>
+
+        <h3 style="margin:15px 0">${esc(q.question)}</h3>
+    `;
+
+    if (q.type === 'multiple') {
+
+        html += q.options.map(o => `
+            <button class="action quiz-option"
+                onclick="checkAnswer('${jsesc(q.answer)}','${jsesc(o)}')">
+                ${esc(o)}
+            </button>
+        `).join('');
+
+    } else if (q.type === 'truefalse') {
+
+        html += `
+            <button class="action"
+                onclick="checkAnswer('true','true')">TRUE</button>
+
+            <button class="action"
+                onclick="checkAnswer('true','false')">FALSE</button>
+        `;
+
+    } else if (q.type === 'identification') {
+
+        html += `
+            <input id="quizInput" placeholder="Type your answer">
+
+            <button class="action" onclick="submitIdentification()">
+                SUBMIT
+            </button>
+        `;
+
+    } else {
+
+        html += `
+            <textarea id="essayInput" placeholder="Write your answer"></textarea>
+
+            <button class="action" onclick="submitEssay()">
+                SUBMIT ESSAY
+            </button>
+        `;
+
+    }
+
+    quizQuestion.innerHTML = html;
+
+}
+
+
+function checkAnswer(correct, chosen) {
+
+    let fb = quizFeedback;
+
+    if (fb.dataset.answered) return;
+
+    let ok =
+        String(chosen).trim().toLowerCase() ===
+        String(correct).trim().toLowerCase();
+
+    if (ok) {
+
+        quizScore++;
+
+        let p = getProgress();
+
+        p.points += 10;
+
+        saveProgress(p);
+
+        fb.innerHTML =
+            '<p style="color:green;margin-top:15px">Correct! +10 points</p>';
+
+    } else {
+
+        fb.innerHTML = `
+            <p style="color:#b44343;margin-top:15px">
+                Incorrect. Correct answer: ${esc(correct)}
+            </p>
+        `;
+
+    }
+
+    fb.dataset.answered = 'yes';
+
+    quizNext.style.display = 'inline-block';
+
+}
+
+
+function submitIdentification() {
+
+    checkAnswer(
+        quizQuestions[quizIndex].answer,
+        quizInput.value
+    );
+
+}
+
+
+function submitEssay() {
+
+    if (!essayInput.value.trim()) {
+
+        alert('Write your answer first.');
+        return;
+
+    }
+
+    quizFeedback.innerHTML =
+        'Essay submitted. It is not automatically graded in this prototype.';
+
+    quizFeedback.dataset.answered = 'yes';
+
+    quizNext.style.display = 'inline-block';
+
+}
+
+
+function nextQuestion() {
+
+    quizIndex++;
+
+    renderQuestion();
+
+}
+
+
+function finishQuiz() {
+
+    if (quizFinished) return;
+
+    quizFinished = true;
+
+    let p = getProgress();
+
+    p.best = Math.max(p.best, quizScore);
+
+    let today = dateKey(new Date());
+
+    if (p.lastDate !== today) {
+
+        let y = new Date();
+
+        y.setDate(y.getDate() - 1);
+
+        p.streak =
+            p.lastDate === dateKey(y)
+            ? p.streak + 1
+            : 1;
+
+        p.lastDate = today;
+
+    }
+
+    saveProgress(p);
+
+    quizQuestion.innerHTML = `
+        <h3>Practice Quiz Completed!</h3>
+
+        <p style="margin-top:15px">
+            Score: <strong>${quizScore}/${quizQuestions.length}</strong>
+        </p>
+
+        <p>You earned ${quizScore * 10} points.</p>
+    `;
+
+    quizFeedback.textContent =
+        'Keep practicing to improve your streak!';
+
+    quizNext.style.display = 'none';
+
+}
+
+
+// PROFILE
+
+function loadProfile() {
+
+    let saved = JSON.parse(
+        localStorage.getItem('lifelabProfile') || '{}'
+    );
+
+    let u = JSON.parse(
+        localStorage.getItem('lifelabUser') || '{}'
+    );
+
+    profileName.value = saved.name || u.name || '';
+
+    profileEmail.value = saved.email || u.email || '';
+
+    profileBio.value = saved.bio || '';
+
+    profileDisplayName.textContent =
+        saved.name || u.name || 'LifeLab Student';
+
+    profileDisplayEmail.textContent =
+        saved.email || u.email || '';
+
+    if (saved.picture) profileAvatar.src = saved.picture;
+
+    updateProgressUI();
+
+    makeReferral();
+
+}
+
+
+function saveProfile() {
+
+    let name = profileName.value.trim();
+
+    let email = profileEmail.value.trim();
+
+    let bio = profileBio.value.trim();
+
+    if (!name || !email) {
+
+        alert('Enter nickname and email');
+
+        return;
+
+    }
+
+    let old = JSON.parse(
+        localStorage.getItem('lifelabProfile') || '{}'
+    );
+
+    localStorage.setItem(
+        'lifelabProfile',
+        JSON.stringify({
+            name,
+            email,
+            bio,
+            picture: old.picture || ''
+        })
+    );
+
+    profileDisplayName.textContent = name;
+
+    profileDisplayEmail.textContent = email;
+
+    profileResult.textContent = 'Profile saved successfully.';
+
+    makeReferral();
+
+}
+
+
+function loadProfilePicture(e) {
+
+    let f = e.target.files[0];
+
+    if (!f) return;
+
+    if (!f.type.startsWith('image/')) {
+        return alert('Choose an image.');
+    }
+
+    let r = new FileReader();
+
+    r.onload = () => {
+
+        let p = JSON.parse(
+            localStorage.getItem('lifelabProfile') || '{}'
+        );
+
+        p.picture = r.result;
+
+        localStorage.setItem(
+            'lifelabProfile',
+            JSON.stringify(p)
+        );
+
+        profileAvatar.src = r.result;
+
+    };
+
+    r.readAsDataURL(f);
+
+}
+
+
+// REFERRAL SYSTEM
+
+function makeReferral() {
+
+    let u = JSON.parse(
+        localStorage.getItem('lifelabUser') || '{}'
+    );
+
+    let ref = (u.email || 'student')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '')
+        .slice(0, 12);
+
+    let link = location.href.split('?')[0] + '?ref=' + ref;
+
+    referralLink.value = link;
+
+    qrCode.innerHTML = '';
+
+    if (window.QRCode) {
+
+        new QRCode(qrCode, {
+            text: link,
+            width: 145,
+            height: 145
+        });
+
+    }
+
+}
+
+
+async function copyReferral() {
+
+    try {
+
+        await navigator.clipboard.writeText(referralLink.value);
+
+        referralMessage.textContent = 'Invitation link copied!';
+
+    } catch (e) {
+
+        referralLink.select();
+
+        document.execCommand('copy');
+
+        referralMessage.textContent =
+            'Copy the selected invitation link.';
+
+    }
+
+}
+
+
+function checkReferral() {
+
+    let ref = new URLSearchParams(location.search).get('ref');
+
+    let u = JSON.parse(
+        localStorage.getItem('lifelabUser') || '{}'
+    );
+
+    if (!ref || !u.email) return;
+
+    let k = 'lifelabReferral_' + u.email.toLowerCase();
+
+    if (!localStorage.getItem(k)) {
+
+        localStorage.setItem(k, ref);
+
+        let p = getProgress();
+
+        p.referrals = (p.referrals || 0) + 1;
+
+        p.referralPoints = (p.referralPoints || 0) + 25;
+
+        p.points += 25;
+
+        saveProgress(p);
+
+        if (document.getElementById('referralMessage')) {
+
+            referralMessage.textContent =
+                'Demo referral detected: +25 points.';
+
+        }
+
+    }
+
+}
+
+
+// UTILITIES
+
+function esc(v) {
+
+    return String(v)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+}
+
+function jsesc(v) {
+
+    return String(v)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'");
+
+}
+
+
+// INITIALIZATION
+
+function init() {
+
+    renderSubjects();
+
+    displayNotes();
+
+    let u = JSON.parse(
+        localStorage.getItem('lifelabUser') || 'null'
+    );
+
+    if (u) {
+
+        authGate.style.display = 'none';
+
+        mainApp.style.display = 'block';
+
+        loadProfile();
+
+        updateProgressUI();
+
+        checkReferral();
+
+    } else {
+
+        authGate.style.display = 'flex';
+
+        mainApp.style.display = 'none';
+
+    }
+
+}
+
+init();
+// MICROSCOPE IMAGE PREVIEW
+document.getElementById('microscopeImage')?.addEventListener('change', function(event) {
+
+    const preview = document.getElementById('microscopePreview');
+    const file = event.target.files[0];
+
+    preview.innerHTML = '';
+
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        preview.innerHTML = '<p>Please upload a valid image.</p>';
+        return;
+    }
+
+    const image = document.createElement('img');
+    image.src = URL.createObjectURL(file);
+    image.alt = 'Microscope image preview';
+
+    image.style.width = '100%';
+    image.style.maxWidth = '500px';
+    image.style.marginTop = '15px';
+    image.style.borderRadius = '12px';
+
+    preview.appendChild(image);
+});
+    // SAVE MICROSCOPE OBSERVATION
+function saveMicroscopeObservation() {
+
+    const observation = {
+        specimen: document.getElementById('specimenName').value.trim(),
+        magnification: document.getElementById('microscopeMagnification').value,
+        stain: document.getElementById('microscopeStain').value,
+        shape: document.getElementById('microscopeShape').value,
+        arrangement: document.getElementById('microscopeArrangement').value,
+        notes: document.getElementById('microscopeNotes').value.trim(),
+        date: new Date().toLocaleString()
+    };
+
+    if (!observation.specimen || !observation.magnification ||
+        !observation.stain || !observation.shape ||
+        !observation.arrangement) {
+
+        alert('Please complete the specimen name, magnification, staining method, shape, and arrangement.');
+        return;
+    }
+
+    const observations = JSON.parse(
+        localStorage.getItem('microscopeObservations') || '[]'
+    );
+
+    observations.push(observation);
+
+    localStorage.setItem(
+        'microscopeObservations',
+        JSON.stringify(observations)
+    );
+renderMicroscopeHistory();
+    document.getElementById('microscopeResult').innerHTML = `
+        <div class="room-card">
+            <h3>Observation Saved Successfully!</h3>
+            <p><strong>Specimen:</strong> ${escapeHTML(observation.specimen)}</p>
+            <p><strong>Magnification:</strong> ${escapeHTML(observation.magnification)}</p>
+            <p><strong>Staining:</strong> ${escapeHTML(observation.stain)}</p>
+            <p><strong>Shape:</strong> ${escapeHTML(observation.shape)}</p>
+            <p><strong>Arrangement:</strong> ${escapeHTML(observation.arrangement)}</p>
+            <p><strong>Notes:</strong> ${escapeHTML(observation.notes || 'None')}</p>
+            <small>${escapeHTML(observation.date)}</small>
+        </div>
+    `;
+
+}
+
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, function(character) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[character];
+    });
+}
+   // DISPLAY SAVED MICROSCOPE OBSERVATIONS
+function renderMicroscopeHistory() {
+
+    const history = document.getElementById('microscopeHistory');
+
+    if (!history) return;
+
+    const observations = JSON.parse(
+        localStorage.getItem('microscopeObservations') || '[]'
+    );
+const total = document.getElementById('microscopeTotal');
+
+if (total) {
+    total.textContent = observations.length;
+}
+    if (observations.length === 0) {
+        history.innerHTML = '<p>No saved observations yet.</p>';
+        return;
+    }
+
+    history.innerHTML = observations.map((item, index) => `
+        <div class="room-card" style="margin-top:15px;">
+            <h4>Observation ${index + 1}</h4>
+            <p><strong>Specimen:</strong> ${escapeHTML(item.specimen)}</p>
+            <p><strong>Magnification:</strong> ${escapeHTML(item.magnification)}</p>
+            <p><strong>Staining:</strong> ${escapeHTML(item.stain)}</p>
+            <p><strong>Shape:</strong> ${escapeHTML(item.shape)}</p>
+            <p><strong>Arrangement:</strong> ${escapeHTML(item.arrangement)}</p>
+            <p><strong>Notes:</strong> ${escapeHTML(item.notes || 'None')}</p>
+            <small>${escapeHTML(item.date)}</small>
+            <button onclick="deleteMicroscopeObservation(${index})"
+    style="margin-top:10px; background:#9b3d32;">
+    DELETE OBSERVATION
+</button>
+        </div>
+    `).join('');
+} 
+    // DELETE MICROSCOPE OBSERVATION
+function deleteMicroscopeObservation(index) {
+
+    if (!confirm('Are you sure you want to delete this observation?')) {
+        return;
+    }
+
+    const observations = JSON.parse(
+        localStorage.getItem('microscopeObservations') || '[]'
+    );
+
+    observations.splice(index, 1);
+
+    localStorage.setItem(
+        'microscopeObservations',
+        JSON.stringify(observations)
+    );
+
+    renderMicroscopeHistory();
+
+    document.getElementById('microscopeResult').innerHTML =
+        '<p>Observation deleted successfully.</p>';
+}
+    // EXPORT MICROSCOPE OBSERVATIONS
+function exportMicroscopeObservations() {
+
+    const observations = JSON.parse(
+        localStorage.getItem('microscopeObservations') || '[]'
+    );
+
+    if (observations.length === 0) {
+        alert('No observations available to download.');
+        return;
+    }
+
+    const columns = [
+        'Specimen',
+        'Magnification',
+        'Staining',
+        'Shape',
+        'Arrangement',
+        'Notes',
+        'Date'
+    ];
+
+    const rows = observations.map(item => [
+        item.specimen,
+        item.magnification,
+        item.stain,
+        item.shape,
+        item.arrangement,
+        item.notes,
+        item.date
+    ]);
+
+    const csv = [columns, ...rows]
+        .map(row => row.map(value =>
+            '"' + String(value ?? '').replace(/"/g, '""') + '"'
+        ).join(','))
+        .join('\n');
+
+    const blob = new Blob([csv], {
+        type: 'text/csv;charset=utf-8;'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'LifeLab_Microscope_Observations.csv';
+    link.click();
+
+    URL.revokeObjectURL(url);
+}
+    async function analyzeMicroscopeImage() {
+    const fileInput = document.getElementById('microscopeImage');
+    const resultBox = document.getElementById('microscopeAIResult');
+    const button = document.getElementById('microscopeAnalyzeBtn');
+
+    const file = fileInput.files[0];
+
+    if (!file) {
+        resultBox.textContent = 'Please upload a microscope image first.';
+        return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    if (!allowedTypes.includes(file.type)) {
+        resultBox.textContent = 'Please upload a JPG, PNG, or WEBP image.';
+        return;
+    }
+
+    if (file.size > 4400000) {
+        resultBox.textContent = 'Image is too large. Please upload an image smaller than 4.4 MB.';
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = 'ANALYZING IMAGE...';
+    resultBox.textContent = 'AI is examining your microscope image. Please wait...';
+
+    try {
+        const reader = new FileReader();
+
+        const imageData = await new Promise((resolve, reject) => {
+            reader.onload = () => {
+                resolve(String(reader.result).split(',')[1]);
+            };
+
+            reader.onerror = () => reject(new Error('Could not read the image.'));
+            reader.readAsDataURL(file);
+        });
+
+        const response = await fetch(
+            'https://lifelab-gemini.pafundar.workers.dev',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'microscope',
+                    imageData: imageData,
+                    mimeType: file.type,
+                    specimen: document.getElementById('specimenName').value,
+                    magnification: document.getElementById('microscopeMagnification').value,
+                    stain: document.getElementById('microscopeStain').value,
+                    shape: document.getElementById('microscopeShape').value,
+                    arrangement: document.getElementById('microscopeArrangement').value,
+                    notes: document.getElementById('microscopeNotes').value
+                }),
+                signal: AbortSignal.timeout(125000)
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            const errorDetails = data.details || data.error || 'AI analysis failed.';
+
+throw new Error(
+    typeof errorDetails === 'string'
+        ? errorDetails
+        : JSON.stringify(errorDetails, null, 2)
+);
+        }
+
+        const analysis = data.analysis;
+
+        if (!analysis) {
+            throw new Error('The AI returned an empty analysis.');
+        }
+
+        const showList = (items) => {
+            if (!Array.isArray(items) || items.length === 0) {
+                return '<p>Not available.</p>';
+            }
+
+            return '<ul>' + items.map(item =>
+                `<li>${escapeHTML(
+                    typeof item === 'object' ? JSON.stringify(item) : item
+                )}</li>`
+            ).join('') + '</ul>';
+        };
+
+        const possibleGroups = Array.isArray(analysis.possibleGroups)
+            ? analysis.possibleGroups.map(item => `
+                <li>
+                    <strong>${escapeHTML(item.group || 'Possible group')}</strong>
+                    <p>${escapeHTML(item.reason || '')}</p>
+                    <small>Confidence: ${escapeHTML(item.confidence || 'Not specified')}</small>
+                </li>
+            `).join('')
+            : '<li>No possible groups provided.</li>';
+
+        resultBox.innerHTML = `
+            <div class="room-card">
+                <h3>AI Microscope Analysis</h3>
+
+                <h4>Image Quality</h4>
+                <p>${escapeHTML(analysis.imageQuality || 'Not specified')}</p>
+
+                <h4>Visible Features</h4>
+                ${showList(analysis.visibleFeatures)}
+
+                <h4>Possible Biological Groups</h4>
+                <ul>${possibleGroups}</ul>
+
+                <h4>Morphology</h4>
+                <p>${escapeHTML(analysis.morphology || 'Not specified')}</p>
+
+                <h4>Limitations</h4>
+                ${showList(analysis.limitations)}
+
+                <h4>Recommended Next Steps</h4>
+                ${showList(analysis.recommendedNextSteps)}
+
+                <h4>Summary</h4>
+                <p>${escapeHTML(analysis.summary || 'No summary provided.')}</p>
+
+                <p style="font-size:13px; margin-top:15px;">
+                    <strong>Disclaimer:</strong>
+                    ${escapeHTML(analysis.disclaimer || 'This is an AI-assisted preliminary analysis. Laboratory confirmation may be required.')}
+                </p>
+            </div>
+        `;
+
+
+    } catch (error) {
+        resultBox.innerHTML = `
+            <div class="room-card">
+                <h3>Analysis Unavailable</h3>
+                <p>${escapeHTML(
+                    error.message || JSON.stringify(error) || 'Something went wrong.'
+                )}</p>
+                <p>Please check your internet connection and try again.</p>
+            </div>
+        `;
+
+    } finally {
+        button.disabled = false;
+        button.textContent = 'ANALYZE IMAGE WITH AI';
+    }
+    }
+</script>
+
+</body>
 </html>
+            
+            
+
+    
