@@ -1318,55 +1318,118 @@ BIOSCAN ROOM
 
 </section>
 
+
 <!-- =========================
-     3D LAB
+     3D LAB - PREMIUM ACCESS
 ========================= -->
 
 <section class="room-page" id="lab">
 
-    <button class="back-btn" onclick="goHome()">← Back to Home</button>
+    <button class="back-btn" onclick="goHome()">
+        ← Back to Home
+    </button>
 
     <h2 class="room-title">3D Lab</h2>
 
     <p class="room-description">
-        Explore interactive biological models.
+        Explore the fascinating world of Biology through interactive 3D models.
     </p>
 
-    <div class="room-box">
+    <div class="room-box" style="text-align:center; padding:35px 20px;">
 
-        <h3>Interactive Biology Resources</h3>
+        <div style="font-size:55px; margin-bottom:15px;">
+            🔒
+        </div>
 
-        <a class="primary"
-            href="https://molview.org/"
-            target="_blank">
+        <h3 style="color:#b18a45;">
+            Premium Access Required
+        </h3>
 
-            OPEN MOLVIEW →
+        <p>
+            Unlock an enhanced learning experience with interactive
+            3D biological models and virtual exploration tools.
+        </p>
 
-        </a>
+        <div style="margin:25px 0;">
 
-        <br><br>
+            <p> Interactive 3D Biology Models</p>
+            <p> Virtual Biological Exploration</p>
+            <p> Advanced Visual Learning Resources</p>
+            <p> Premium Biology Review Materials</p>
 
-        <a class="primary"
-            href="https://www.cellsalive.com/"
-            target="_blank">
+        </div>
 
-            OPEN CELLS ALIVE →
+        <button class="action"
+    onclick="document.getElementById('premiumModal').style.display='flex'">
+    🔓 UNLOCK WITH PREMIUM
+</button>
 
-        </a>
-
-        <p class="small" style="margin-top:20px">
-            Premium 3D content may be added in future versions.
+        <p class="small" style="margin-top:18px;">
+            LifeLab Premium — Learn Biology Beyond the Classroom.
         </p>
 
     </div>
 
+<!-- LIFELAB PREMIUM POPUP -->
+
+<div id="premiumModal"
+    style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+
+    <div style="background:#fffdf5; color:#263b2c; width:100%; max-width:430px; padding:30px 22px; border-radius:18px; text-align:center; position:relative;">
+
+        <div style="font-size:45px;">👑</div>
+
+        <h2 style="color:#b18a45; margin:12px 0;">
+            LifeLab Premium
+        </h2>
+
+        <p>
+            Take your Biology learning experience to the next level!
+        </p>
+
+        <div style="text-align:left; margin:25px 0; line-height:2;">
+            <p>🔬 Exclusive interactive 3D models</p>
+            <p>🧬 Advanced biological exploration</p>
+            <p>📚 Premium Biology reviewer materials</p>
+            <p>✨ Enhanced learning resources</p>
+        </div>
+
+        <div style="background:#f4eddd; padding:15px; border-radius:12px; margin-bottom:20px;">
+            <h3 style="color:#b18a45; margin:0 0 8px;">
+                Coming Soon!
+            </h3>
+            <p style="margin:0; font-size:14px;">
+                LifeLab Premium is currently under development.
+                Stay tuned for exclusive access!
+            </p>
+        </div>
+
+        <button class="action"
+            onclick="document.getElementById('premiumModal').style.display='none'">
+            CLOSE
+        </button>
+
+    </div>
+</div>
+
 </section>
+
+<!-- =========================
+     MICROSCOPE LAB
+========================= -->
+
 <section class="room-page" id="microscope">
 
-    <h2>MicroScope Lab</h2>
-    <p>Explore the microscopic world and practice identifying microorganisms.</p>
+    <button class="back-btn" onclick="goHome()">
+        ← Back to Home
+    </button>
 
-    <!-- IMAGE UPLOAD -->
+    <h2 class="room-title">MicroScope Lab</h2>
+
+    <p class="room-description">
+        Explore the microscopic world and practice identifying microorganisms.
+    </p>
+
     <div class="room-card">
         <h3>Microscope Image Upload</h3>
         <p>Upload a photo taken through a microscope to begin your observation.</p>
@@ -1374,21 +1437,20 @@ BIOSCAN ROOM
         <input type="file" id="microscopeImage" accept="image/*">
 
         <div id="microscopePreview" style="margin-top:20px;"></div>
-      <div style="margin-top:20px;">
-    <button onclick="analyzeMicroscopeImage()" id="microscopeAnalyzeBtn">
-        ANALYZE IMAGE WITH AI
-    </button>
 
-    <p style="font-size:13px; margin-top:10px;">
-        AI-assisted preliminary analysis only. Laboratory confirmation may be required.
-    </p>
+        <div style="margin-top:20px;">
+            <button onclick="analyzeMicroscopeImage()" id="microscopeAnalyzeBtn">
+                ANALYZE IMAGE WITH AI
+            </button>
 
-    <div id="microscopeAIResult" style="margin-top:20px;"></div>
-      </div>
+            <p style="font-size:13px; margin-top:10px;">
+                AI-assisted preliminary analysis only. Laboratory confirmation may be required.
+            </p>
+
+            <div id="microscopeAIResult" style="margin-top:20px;"></div>
+        </div>
     </div>
-  
 
-    <!-- OBSERVATION RECORD -->
     <div class="room-card">
         <h3>Microscope Observation Record</h3>
         <p>Record the details of your microscopic specimen.</p>
@@ -1404,6 +1466,7 @@ BIOSCAN ROOM
             <option>400x</option>
             <option>1000x</option>
         </select>
+
         <label>Staining Method</label>
         <select id="microscopeStain">
             <option value="">Select staining method</option>
@@ -1439,12 +1502,13 @@ BIOSCAN ROOM
         <textarea id="microscopeNotes" rows="4"
             placeholder="Describe color, movement, structures, and other visible features..."></textarea>
 
-        <button onclick="saveMicroscopeObservation()">SAVE OBSERVATION</button>
+        <button onclick="saveMicroscopeObservation()">
+            SAVE OBSERVATION
+        </button>
 
         <div id="microscopeResult" style="margin-top:20px;"></div>
     </div>
 
-    <!-- DASHBOARD -->
     <div class="room-card">
         <h3>My Microscopy Dashboard</h3>
         <p>Total Saved Observations</p>
@@ -1452,7 +1516,6 @@ BIOSCAN ROOM
         <p>Keep track of your laboratory observations.</p>
     </div>
 
-    <!-- HISTORY -->
     <div class="room-card">
         <h3>Saved Observations History</h3>
         <p>Review your previously recorded microscope observations.</p>
@@ -1466,46 +1529,35 @@ BIOSCAN ROOM
         </div>
     </div>
 
-    <!-- REFERENCE GUIDE -->
     <div class="room-card">
         <h3>Microscopy Reference Guide</h3>
         <p>Learn about the characteristics of different microorganisms.</p>
 
         <div class="microscope-guide">
 
-            <div style="margin-bottom:18px;">
-                <h4>1. Bacteria</h4>
-                <p><strong>Cocci:</strong> Spherical or round-shaped cells.</p>
-                <p><strong>Bacilli:</strong> Rod-shaped cells.</p>
-                <p><strong>Spirilla:</strong> Spiral-shaped cells.</p>
-                <p><strong>Common arrangements:</strong> Single, pairs, chains, and clusters.</p>
-            </div>
+            <h4>1. Bacteria</h4>
+            <p><strong>Cocci:</strong> Spherical or round-shaped cells.</p>
+            <p><strong>Bacilli:</strong> Rod-shaped cells.</p>
+            <p><strong>Spirilla:</strong> Spiral-shaped cells.</p>
+            <p><strong>Common arrangements:</strong> Single, pairs, chains, and clusters.</p>
 
-            <div style="margin-bottom:18px;">
-                <h4>2. Protozoa</h4>
-                <p>Single-celled eukaryotic organisms. Some move using cilia, flagella, or pseudopodia.</p>
-            </div>
+            <h4>2. Protozoa</h4>
+            <p>Single-celled eukaryotic organisms. Some move using cilia, flagella, or pseudopodia.</p>
 
-            <div style="margin-bottom:18px;">
-                <h4>3. Algae</h4>
-                <p>Photosynthetic organisms that may appear as single cells, colonies, or filaments.</p>
-            </div>
+            <h4>3. Algae</h4>
+            <p>Photosynthetic organisms that may appear as single cells, colonies, or filaments.</p>
 
-            <div style="margin-bottom:18px;">
-                <h4>4. Fungi</h4>
-                <p>May appear as budding yeast cells or thread-like hyphae.</p>
-            </div>
+            <h4>4. Fungi</h4>
+            <p>May appear as budding yeast cells or thread-like hyphae.</p>
 
-            <div style="margin-bottom:18px;">
-                <h4>5. Microscopy Reminders</h4>
-                <ul>
-                    <li>Record the magnification used.</li>
-                    <li>Observe cell shape and arrangement.</li>
-                    <li>Record the staining method.</li>
-                    <li>Compare observations with reliable laboratory references.</li>
-                    <li>Do not identify bacterial species based on shape alone.</li>
-                </ul>
-            </div>
+            <h4>5. Microscopy Reminders</h4>
+            <ul>
+                <li>Record the magnification used.</li>
+                <li>Observe cell shape and arrangement.</li>
+                <li>Record the staining method.</li>
+                <li>Compare observations with reliable laboratory references.</li>
+                <li>Do not identify bacterial species based on shape alone.</li>
+            </ul>
 
         </div>
     </div>
